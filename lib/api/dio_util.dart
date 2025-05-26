@@ -10,7 +10,7 @@ class DioUtil {
 
   static DioUtil? _instance;
   static Dio _dio = Dio();
-  Dio get dio => _dio;
+  static Dio get dio => _dio;
 
 
   DioUtil._internal() {

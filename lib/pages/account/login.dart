@@ -6,6 +6,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 
 String? _validateEmail(String? text) {
@@ -79,6 +82,43 @@ class LoginPage extends HookConsumerWidget {
               url: '???',
               name: name));
       */
+    }
+
+    Future<void> _signInWithGoogle() async {
+      try {
+        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        if (googleUser == null) {
+          // User cancelled the sign-in
+          return;
+        }
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        await FirebaseAuth.instance.signInWithCredential(credential);
+        SmartDialog.showToast('Google login successful');
+        // Navigate to another screen or update UI
+      } catch (e) {
+        SmartDialog.showToast('Google login failed: $e');
+      }
+    }
+
+    Future<void> _signInWithFacebook() async {
+      try {
+        final LoginResult result = await FacebookAuth.instance.login();
+        if (result.status == LoginStatus.success) {
+          final AccessToken accessToken = result.accessToken!;
+          final AuthCredential credential = FacebookAuthProvider.credential(accessToken.tokenString);
+          await FirebaseAuth.instance.signInWithCredential(credential);
+          SmartDialog.showToast('Facebook login successful');
+          // Navigate to another screen or update UI
+        } else {
+          SmartDialog.showToast('Facebook login failed: ${result.message}');
+        }
+      } catch (e) {
+        SmartDialog.showToast('Facebook login failed: $e');
+      }
     }
 
     return Scaffold(
@@ -181,6 +221,22 @@ class LoginPage extends HookConsumerWidget {
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
+                    ),
+                    const SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: _signInWithGoogle,
+                          icon: const Icon(Icons.g_mobiledata), // Replace with Google icon
+                          label: const Text('Google'),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: _signInWithFacebook,
+                          icon: const Icon(Icons.facebook), // Replace with Facebook icon
+                          label: const Text('Facebook'),
+                        ),
+                      ],
                     ),
                   ],
                 ),

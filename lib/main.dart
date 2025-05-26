@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:app/api/dio_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:logging/logging.dart';
+import 'package:firebase_core/firebase_core.dart';
 import './routes.dart';
 import 'l10n/app_localizations.dart';
 
@@ -16,6 +18,10 @@ void main() {
 
   runZonedGuarded<Future<Null>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    // 检查 是否时网页
+    if (!kIsWeb) {
+      await Firebase.initializeApp();
+    }
     initLogger();
     runApp(const MyApp());
     ///屏幕刷新率和显示率不一致时的优化，必须挪动到 runApp 之后
@@ -32,7 +38,7 @@ void main() {
 initLogger() {
   if(!kReleaseMode){
     Logger.root.level = Level.FINE;
-
+    DioUtil.getInstance().openLog();
   } else {
     Logger.root.level = Level.WARNING;
   }
