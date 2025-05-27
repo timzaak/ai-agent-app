@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:app/pages/index_tab/device_qr_scan.dart'; // Assuming this is the correct path
+import 'package:app/pages/index_tab/device_qr_scan_page.dart'; // Updated import
 
 // Placeholder for Device model, replace with actual model if available
 class Device {

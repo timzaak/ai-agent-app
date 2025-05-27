@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
+import '../account/password_page.dart';
+import '../account/password_type.dart';
 // Assuming your login page route name is 'login' as defined in your GoRouter setup
 // import 'package:app/pages/account/login.dart'; 
 
@@ -105,6 +108,17 @@ class MyPage extends StatelessWidget {
             onTap: () => _viewPrivacyPolicy(context),
           ),
           const Divider(),
+          ListTile(
+            leading: const Icon(Icons.lock_outline),
+            title: const Text('修改密码'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              GoRouter.of(context).pushNamed(
+                ChangePasswordPage.sName,
+                extra: ChangePasswordType.ResetPassword,
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),

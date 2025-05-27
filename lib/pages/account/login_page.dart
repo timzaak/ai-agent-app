@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_color_plugin/flutter_color_plugin.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,14 +8,13 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../util/validator.dart';
+import 'password_page.dart';
+import 'password_type.dart';
 
 
-String? _validateEmail(String? text) {
-  if (text == null || !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(text)) {
-    return '邮箱地址格式不正确';
-  }
-  return null;
-}
 
 class LoginPage extends HookConsumerWidget {
   static const sName = 'login';
@@ -42,7 +40,7 @@ class LoginPage extends HookConsumerWidget {
 
     void _getCode() async {
       if (seconds.value == null) {
-        var v = _validateEmail(emailController.text.trim());
+        var v = validateEmail(emailController.text.trim());
         if(v != null) {
           SmartDialog.showToast(v);
         }
@@ -145,7 +143,7 @@ class LoginPage extends HookConsumerWidget {
                         hintText: '请输入邮箱',
                       ),
                       validator: (text) {
-                        return _validateEmail(text);
+                        return validateEmail(text);
                       },
                     ),
                     const SizedBox(height: 20),
@@ -168,7 +166,20 @@ class LoginPage extends HookConsumerWidget {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 20),
+                    // Forgot Password Button
+                    Container(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          GoRouter.of(context).pushNamed(
+                            ChangePasswordPage.sName,
+                            extra: ChangePasswordType.ForgotPassword, // Updated enum
+                          );
+                        },
+                        child: const Text('忘记密码?'),
+                      ),
+                    ),
+                    const SizedBox(height: 10), // Adjusted spacing
                     InkWell(
                       onTap: () => agreeDeal.value = !agreeDeal.value,
                       child: Text.rich(

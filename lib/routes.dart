@@ -1,11 +1,15 @@
-import 'package:app/pages/index_tab/my.dart';
+import 'pages/account/login_page.dart';
+import 'pages/account/password_page.dart';
+import 'pages/index_tab/my_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'pages/account/login.dart';
-import 'package:app/pages/index_tab/device.dart'; // Added import
-import 'package:app/pages/index_tab/device_qr_scan.dart'; // Added import
+import 'pages/index_tab/device_page.dart';
+import 'pages/index_tab/device_qr_scan_page.dart';
+
+import 'pages/account/password_type.dart';
+import 'pages/index_tab/index_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
 GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -14,7 +18,7 @@ GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/a',
+  initialLocation: '/index', // Changed from '/a'
   observers: [FlutterSmartDialog.observer],
   debugLogDiagnostics: kDebugMode,
   routes: <RouteBase>[
@@ -25,20 +29,12 @@ final GoRouter appRouter = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
-          path: '/a',
+          path: '/index', // Changed from '/a'
           builder: (BuildContext context, GoRouterState state) {
-            return const ScreenA();
+            return const IndexPage(); // Use IndexPage
           },
-          routes: <RouteBase>[
-            // The details screen to display stacked on the inner Navigator.
-            // This will cover screen A but not the application shell.
-            GoRoute(
-              path: 'details',
-              builder: (BuildContext context, GoRouterState state) {
-                return const DetailsScreen(label: 'A');
-              },
-            ),
-          ],
+          // Removing the sub-route 'details' for '/a' as IndexPage doesn't use it.
+          // If details are needed for IndexPage items, this should be re-evaluated.
         ),
 
         /// Displayed when the second item in the the bottom navigation bar is
@@ -84,6 +80,18 @@ final GoRouter appRouter = GoRouter(
         return const LoginPage();
       },
     ),
+    GoRoute(
+      path: '/password',
+      name: ChangePasswordPage.sName,
+      builder: (BuildContext context, GoRouterState state) {
+        final type = state.extra as ChangePasswordType?;
+        if (type == null) {
+          throw ArgumentError(
+              'ChangePasswordType must be provided when navigating to PasswordPage');
+        }
+        return ChangePasswordPage(type: type);
+      },
+    ),
   ],
 );
 
@@ -109,7 +117,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'A Screen',
+            label: 'Home', // Changed label to 'Home'
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.devices), // Changed icon for Devices
@@ -128,7 +136,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
   static int _calculateSelectedIndex(BuildContext context) {
     final String location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/a')) {
+    if (location.startsWith('/index')) { // Changed from '/a'
       return 0;
     }
     if (location.startsWith('/device')) { // Changed /b to /device
@@ -143,41 +151,21 @@ class ScaffoldWithNavBar extends StatelessWidget {
   void _onItemTapped(int index, BuildContext context) {
     switch (index) {
       case 0:
-        GoRouter.of(context).go('/a');
+        GoRouter.of(context).go('/index'); // Changed from '/a'
+        break;
       case 1:
         GoRouter.of(context).go('/device'); // Changed /b to /device
+        break;
       case 2:
         GoRouter.of(context).go('/my');
+        break;
     }
   }
 }
 
-/// The first screen in the bottom navigation bar.
-class ScreenA extends StatelessWidget {
-  /// Constructs a [ScreenA] widget.
-  const ScreenA({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text('Screen A'),
-            TextButton(
-              onPressed: () {
-                GoRouter.of(context).go('/a/details');
-              },
-              child: const Text('View A details'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// ScreenA is removed as IndexPage is now used for '/a'.
+// If ScreenA and its 'details' route were used elsewhere, they should be kept or refactored.
+// For this task, assuming ScreenA is fully replaced by IndexPage.
 
 /// The second screen in the bottom navigation bar.
 class ScreenB extends StatelessWidget {
