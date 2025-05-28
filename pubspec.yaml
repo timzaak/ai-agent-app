@@ -59,6 +59,7 @@ dependencies:
   mobile_scanner: ^7.0.0
   chewie: ^1.11.3
   video_player: ^2.9.5
+  cloudflare_turnstile: ^3.2.1
 
 dev_dependencies:
   flutter_test:
