@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../util/validator.dart';
+import '../../util/turnstile_util.dart';
 import 'password_type.dart';
 
 class ChangePasswordPage extends HookConsumerWidget {
@@ -74,7 +75,14 @@ class ChangePasswordPage extends HookConsumerWidget {
                   TextButton(
                     onPressed: isCounting.value
                         ? null
-                        : () {
+                        : () async {
+                            final token = await getTurnstileToken();
+                            if (token == null) {
+                              print('Captcha verification failed. Please try again.');
+                              return;
+                            }
+                            // The utility function now handles printing the token in debug mode.
+                            // print('Turnstile token: $token'); 
                             if (formKey.currentState?.validate() ?? false) {
                               // TODO: Implement API call to send verification code
                               print('Requesting verification code for ${emailController.text}');
@@ -89,7 +97,14 @@ class ChangePasswordPage extends HookConsumerWidget {
               ),
               const SizedBox(height: 24.0),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  final token = await getTurnstileToken();
+                  if (token == null) {
+                    print('Captcha verification failed. Please try again.');
+                    return;
+                  }
+                  // The utility function now handles printing the token in debug mode.
+                  // print('Turnstile token: $token');
                   if (formKey.currentState?.validate() ?? false) {
                     // TODO: Implement submit logic
                     print('Submitting form with email: ${emailController.text} and code: ${codeController.text}');

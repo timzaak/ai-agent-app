@@ -10,6 +10,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../util/validator.dart';
+import '../../util/turnstile_util.dart';
 import 'password_page.dart';
 import 'password_type.dart';
 
@@ -31,9 +32,6 @@ class LoginPage extends HookConsumerWidget {
 
     useEffect(() {
       return () {
-        emailController.dispose();
-        codeController.dispose();
-        passwordController.dispose();
         timer.value?.cancel();
       };
     }, []);
@@ -58,6 +56,14 @@ class LoginPage extends HookConsumerWidget {
     }
 
     void _handleLogin() async {
+      final token = await getTurnstileToken();
+      if (token == null) {
+        SmartDialog.showToast('Captcha verification failed. Please try again.');
+        return;
+      }
+      // If we are in debug mode, print the token. In production, this will be handled by the utility.
+      // print('Turnstile token: $token'); // Placeholder for actual usage
+
       return;
       if (formKey.currentState?.validate() == true) {
         if (agreeDeal.value) {
