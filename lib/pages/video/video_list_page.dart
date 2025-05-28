@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class VideoListPage extends HookConsumerWidget {
   const VideoListPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final videoList = useState([
       {
         'snapImage': 'https://via.placeholder.com/150/FF0000/FFFFFF?Text=Video1',
-        '时间': '10:30',
-        '设备名称': 'Device 1',
+        'time': '10:30',
+        'deviceName': 'Device 1',
       },
       {
         'snapImage': 'https://via.placeholder.com/150/00FF00/FFFFFF?Text=Video2',
-        '时间': '11:45',
-        '设备名称': 'Device 2',
+        'time': '11:45',
+        'deviceName': 'Device 2',
       },
       {
         'snapImage': 'https://via.placeholder.com/150/0000FF/FFFFFF?Text=Video3',
-        '时间': '14:20',
-        '设备名称': 'Device 1',
+        'time': '14:20',
+        'deviceName': 'Device 1',
       },
     ]);
 
@@ -31,15 +33,15 @@ class VideoListPage extends HookConsumerWidget {
     if (videoList.value.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Video List'),
+          title: Text(l10n.videoList),
         ),
-        body: const Center(
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.videocam_off, size: 50),
-              SizedBox(height: 16),
-              Text('No videos found'),
+              const Icon(Icons.videocam_off, size: 50),
+              const SizedBox(height: 16),
+              Text(l10n.noVideosFound),
             ],
           ),
         ),
@@ -48,7 +50,7 @@ class VideoListPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Video List'),
+        title: Text(l10n.videoList),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -81,11 +83,11 @@ class VideoListPage extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Time: ${video['时间']}',
+                            l10n.time.replaceAll('{time}', video['time'] as String),
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
-                          Text('Device: ${video['设备名称']}'),
+                          Text(l10n.device.replaceAll('{name}', video['deviceName'] as String)),
                         ],
                       ),
                     ),

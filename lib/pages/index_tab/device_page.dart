@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:app/pages/index_tab/device_qr_scan_page.dart'; // Updated import
 
 // Placeholder for Device model, replace with actual model if available
@@ -18,9 +19,10 @@ class DevicePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Devices'),
+        title: Text(l10n.myDevices),
       ),
       body: devices.isEmpty
           ? Center(
@@ -31,7 +33,7 @@ class DevicePage extends StatelessWidget {
                   context.goNamed(DeviceQrScanPage.sName);
                 },
                 icon: const Icon(Icons.qr_code_scanner),
-                label: const Text('Scan QR code to add device'),
+                label: Text(l10n.scanQrToAddDevice),
               ),
             )
           : ListView.builder(

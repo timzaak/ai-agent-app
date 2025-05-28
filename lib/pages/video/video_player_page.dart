@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class VideoPlayerPage extends HookConsumerWidget {
   final String videoUrl;
@@ -12,6 +13,7 @@ class VideoPlayerPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final videoPlayerController = useState<VideoPlayerController?>(null);
     final chewieController = useState<ChewieController?>(null);
     final isLoading = useState<bool>(true);
@@ -27,7 +29,7 @@ class VideoPlayerPage extends HookConsumerWidget {
           try {
             parsedUri = Uri.parse(videoUrl);
           } catch (e) {
-            error.value = 'Invalid video URL format: $videoUrl';
+            error.value = l10n.videoError;
             isLoading.value = false;
             return;
           }
@@ -55,7 +57,7 @@ class VideoPlayerPage extends HookConsumerWidget {
           chewieController.value = newChewieController;
           error.value = null;
         } catch (e) {
-          error.value = 'Failed to load video: ${e.toString()}';
+          error.value = l10n.unexpectedError.replaceAll('{error}', e.toString());
         } finally {
           isLoading.value = false;
         }
@@ -83,7 +85,7 @@ class VideoPlayerPage extends HookConsumerWidget {
       return Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
-          title: const Text('Video Error'),
+          title: Text(l10n.videoError),
           backgroundColor: Colors.black,
           iconTheme: const IconThemeData(color: Colors.white),
           titleTextStyle: const TextStyle(color: Colors.white),
@@ -111,9 +113,14 @@ class VideoPlayerPage extends HookConsumerWidget {
       );
     }
 
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(child: Text('Initializing player...', style: TextStyle(color: Colors.white))),
+      body: Center(
+        child: Text(
+          l10n.initializingPlayer,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
     );
   }
 }

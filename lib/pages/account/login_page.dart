@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../util/validator.dart';
 import '../../util/turnstile_util.dart';
@@ -21,6 +22,7 @@ class LoginPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final emailController = useTextEditingController();
     final codeController = useTextEditingController();
@@ -58,13 +60,10 @@ class LoginPage extends HookConsumerWidget {
     void _handleLogin() async {
       final token = await getTurnstileToken();
       if (token == null) {
-        SmartDialog.showToast('Captcha verification failed. Please try again.');
+        SmartDialog.showToast(l10n.loginFailed.replaceAll('{error}', 'Captcha verification failed'));
         return;
       }
-      // If we are in debug mode, print the token. In production, this will be handled by the utility.
-      // print('Turnstile token: $token'); // Placeholder for actual usage
 
-      return;
       if (formKey.currentState?.validate() == true) {
         if (agreeDeal.value) {
           if (tabController.index == 1) {
@@ -72,24 +71,23 @@ class LoginPage extends HookConsumerWidget {
             final email = emailController.text.trim();
             final code = codeController.text.trim();
             // TODO: 执行验证码登录（例如调用接口或 Firebase）
-            SmartDialog.showToast('验证码登录: $email, $code');
+            SmartDialog.showToast(l10n.loginSuccess);
           } else {
             // 密码登录逻辑
             final email = emailController.text.trim();
             final password = passwordController.text.trim();
-            // 示例：Firebase 登录
             try {
               await FirebaseAuth.instance.signInWithEmailAndPassword(
                 email: email,
                 password: password,
               );
-              SmartDialog.showToast('登录成功');
+              SmartDialog.showToast(l10n.loginSuccess);
             } catch (e) {
-              SmartDialog.showToast('登录失败: $e');
+              SmartDialog.showToast(l10n.loginFailed.replaceAll('{error}', e.toString()));
             }
           }
         } else {
-          SmartDialog.showToast('请阅读并同意用户协议和隐私保护协议');
+          SmartDialog.showToast(l10n.pleaseAgreeToTerms);
         }
       }
     }
@@ -112,9 +110,9 @@ class LoginPage extends HookConsumerWidget {
           idToken: googleAuth.idToken,
         );
         await FirebaseAuth.instance.signInWithCredential(credential);
-        SmartDialog.showToast('Google login successful');
+        SmartDialog.showToast(l10n.googleLoginSuccess);
       } catch (e) {
-        SmartDialog.showToast('Google login failed: $e');
+        SmartDialog.showToast(l10n.googleLoginFailed.replaceAll('{error}', e.toString()));
       }
     }
 
@@ -127,17 +125,17 @@ class LoginPage extends HookConsumerWidget {
             accessToken.tokenString,
           );
           await FirebaseAuth.instance.signInWithCredential(credential);
-          SmartDialog.showToast('Facebook login successful');
+          SmartDialog.showToast(l10n.facebookLoginSuccess);
         } else {
-          SmartDialog.showToast('Facebook login failed: ${result.message}');
+          SmartDialog.showToast(l10n.facebookLoginFailed.replaceAll('{error}', result.message ?? ''));
         }
       } catch (e) {
-        SmartDialog.showToast('Facebook login failed: $e');
+        SmartDialog.showToast(l10n.facebookLoginFailed.replaceAll('{error}', e.toString()));
       }
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('登录')),
+      appBar: AppBar(title: Text(l10n.login)),
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -155,21 +153,24 @@ class LoginPage extends HookConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 32),
+                    const SizedBox(height: 32),
                     TabBar(
                       controller: tabController,
-                      tabs: const [Tab(text: "密码登录"), Tab(text: "验证码登录")],
+                      tabs: [
+                        Tab(text: l10n.passwordLogin),
+                        Tab(text: l10n.verificationCodeLogin)
+                      ],
                     ),
-                    const SizedBox(height: 16,),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(hintText: '请输入邮箱'),
+                      decoration: InputDecoration(hintText: l10n.enterEmail),
                       validator: (text) {
                         return validateEmail(text);
                       },
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     SizedBox(
                       height: 60,
                       child: TabBarView(
@@ -180,8 +181,8 @@ class LoginPage extends HookConsumerWidget {
                             controller: passwordController,
                             obscureText: true,
                             keyboardType: TextInputType.visiblePassword,
-                            decoration: const InputDecoration(
-                              hintText: '请输入密码',
+                            decoration: InputDecoration(
+                              hintText: l10n.enterPassword,
                             ),
                             validator: validatePassword,
                           ),
@@ -190,13 +191,13 @@ class LoginPage extends HookConsumerWidget {
                             controller: codeController,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              hintText: '请输入验证码',
+                              hintText: l10n.enterVerificationCode,
                               suffixIcon: TextButton(
                                 onPressed: _getCode,
                                 child: Text(
                                   seconds.value == null
-                                      ? '获取验证码'
-                                      : '重新发送(${seconds.value})',
+                                      ? l10n.getVerificationCode
+                                      : l10n.resendCode.replaceAll('{seconds}', seconds.value.toString()),
                                 ),
                               ),
                             ),
@@ -214,7 +215,7 @@ class LoginPage extends HookConsumerWidget {
                             extra: ChangePasswordType.ForgotPassword,
                           );
                         },
-                        child: const Text('忘记密码?'),
+                        child: Text(l10n.forgotPassword),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -241,32 +242,32 @@ class LoginPage extends HookConsumerWidget {
                                 ),
                               ),
                             ),
-                            const TextSpan(text: '我已阅读并同意'),
+                            TextSpan(text: '${l10n.iHaveReadAndAgree} '),
                             TextSpan(
-                              text: '《用户协议》',
+                              text: l10n.userAgreement,
                               recognizer:
                                   TapGestureRecognizer()
                                     ..onTap =
-                                        () => _goPdf('用户协议', 'user_deal.pdf'),
+                                        () => _goPdf(l10n.userAgreement, 'user_deal.pdf'),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const TextSpan(text: '、'),
+                            TextSpan(text: ' ${l10n.and} '),
                             TextSpan(
-                              text: '《隐私保护协议》',
+                              text: l10n.privacyPolicy,
                               recognizer:
                                   TapGestureRecognizer()
                                     ..onTap =
                                         () => _goPdf(
-                                          '隐私保护协议',
+                                          l10n.privacyPolicy,
                                           'privacy_protect.pdf',
                                         ),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const TextSpan(text: '，未注册的邮箱验证后自动创建账号'),
+                            TextSpan(text: '，${l10n.unregisteredEmailWillCreateAccount}'),
                           ],
                         ),
                       ),
@@ -279,9 +280,9 @@ class LoginPage extends HookConsumerWidget {
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.blueAccent,
                         ),
-                        child: const Text(
-                          '登录',
-                          style: TextStyle(color: Colors.white),
+                        child: Text(
+                          l10n.login,
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     ),

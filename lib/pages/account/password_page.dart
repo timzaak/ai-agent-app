@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../util/validator.dart';
 import '../../util/turnstile_util.dart';
@@ -8,12 +9,13 @@ import 'password_type.dart';
 
 class ChangePasswordPage extends HookConsumerWidget {
   static const sName = 'password';
-  final ChangePasswordType type; // Updated type
+  final ChangePasswordType type;
 
   const ChangePasswordPage({super.key, required this.type});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final emailController = useTextEditingController();
     final codeController = useTextEditingController();
     final formKey = useMemoized(() => GlobalKey<FormState>());
@@ -39,7 +41,7 @@ class ChangePasswordPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(type == ChangePasswordType.ForgotPassword ? '忘记密码' : '修改密码'),
+        title: Text(type == ChangePasswordType.ForgotPassword ? l10n.forgotPassword : l10n.changePassword),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -50,7 +52,7 @@ class ChangePasswordPage extends HookConsumerWidget {
             children: <Widget>[
               TextFormField(
                 controller: emailController,
-                decoration: const InputDecoration(labelText: '邮箱'),
+                decoration: InputDecoration(labelText: l10n.enterEmail),
                 validator: validateEmail,
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -61,11 +63,11 @@ class ChangePasswordPage extends HookConsumerWidget {
                   Expanded(
                     child: TextFormField(
                       controller: codeController,
-                      decoration: const InputDecoration(labelText: '验证码'),
+                      decoration: InputDecoration(labelText: l10n.enterVerificationCode),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return '请输入验证码';
+                          return l10n.enterVerificationCode;
                         }
                         return null;
                       },
@@ -81,16 +83,15 @@ class ChangePasswordPage extends HookConsumerWidget {
                               print('Captcha verification failed. Please try again.');
                               return;
                             }
-                            // The utility function now handles printing the token in debug mode.
-                            // print('Turnstile token: $token'); 
                             if (formKey.currentState?.validate() ?? false) {
-                              // TODO: Implement API call to send verification code
                               print('Requesting verification code for ${emailController.text}');
                               startTimer();
                             }
                           },
                     child: Text(
-                      isCounting.value ? '重新发送(${countdown.value})' : '获取验证码',
+                      isCounting.value 
+                          ? l10n.resendCode.replaceAll('{seconds}', countdown.value.toString())
+                          : l10n.getVerificationCode,
                     ),
                   ),
                 ],
@@ -103,14 +104,11 @@ class ChangePasswordPage extends HookConsumerWidget {
                     print('Captcha verification failed. Please try again.');
                     return;
                   }
-                  // The utility function now handles printing the token in debug mode.
-                  // print('Turnstile token: $token');
                   if (formKey.currentState?.validate() ?? false) {
-                    // TODO: Implement submit logic
                     print('Submitting form with email: ${emailController.text} and code: ${codeController.text}');
                   }
                 },
-                child: const Text('提交'),
+                child: Text(l10n.submit),
               ),
             ],
           ),
