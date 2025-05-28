@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'pages/index_tab/device_page.dart';
 import 'pages/index_tab/device_qr_scan_page.dart';
+import 'pages/video/video_list_page.dart';
+import 'pages/video/video_player_page.dart';
 
 import 'pages/account/password_type.dart';
 import 'pages/index_tab/index_page.dart';
@@ -18,7 +20,7 @@ GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/login',
+  initialLocation: '/index',
   observers: [FlutterSmartDialog.observer],
   debugLogDiagnostics: kDebugMode,
   routes: <RouteBase>[
@@ -58,14 +60,6 @@ final GoRouter appRouter = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return const MyPage();
           },
-          routes: <RouteBase>[
-            GoRoute(
-              path: 'details',
-              builder: (BuildContext context, GoRouterState state) {
-                return const DetailsScreen(label: 'C');
-              },
-            ),
-          ],
         ),
       ],
     ),
@@ -88,12 +82,24 @@ final GoRouter appRouter = GoRouter(
         return ChangePasswordPage(type: type);
       },
     ),
+    GoRoute(
+      path: '/videos',
+      builder: (BuildContext context, GoRouterState state) {
+        return const VideoListPage();
+      },
+    ),
+    GoRoute(
+      path: '/video_player/:videoUrl',
+      builder: (BuildContext context, GoRouterState state) {
+        final videoUrl = state.pathParameters['videoUrl']!;
+        return VideoPlayerPage(videoUrl: Uri.decodeComponent(videoUrl));
+      },
+    ),
   ],
 );
 
 
-/// Builds the "shell" for the app by building a Scaffold with a
-/// BottomNavigationBar, where [child] is placed in the body of the Scaffold.
+
 class ScaffoldWithNavBar extends StatelessWidget {
   /// Constructs an [ScaffoldWithNavBar].
   const ScaffoldWithNavBar({
@@ -101,8 +107,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
     super.key,
   });
 
-  /// The widget to display in the body of the Scaffold.
-  /// In this sample, it is a Navigator.
   final Widget child;
 
   @override
@@ -113,14 +117,14 @@ class ScaffoldWithNavBar extends StatelessWidget {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home', // Changed label to 'Home'
+            label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.devices), // Changed icon for Devices
-            label: 'Devices', // Changed label for Devices
+            icon: Icon(Icons.devices),
+            label: 'Devices',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notification_important_rounded),
+            icon: Icon(Icons.person),
             label: 'My',
           ),
         ],
@@ -156,93 +160,5 @@ class ScaffoldWithNavBar extends StatelessWidget {
         GoRouter.of(context).go('/my');
         break;
     }
-  }
-}
-
-// ScreenA is removed as IndexPage is now used for '/a'.
-// If ScreenA and its 'details' route were used elsewhere, they should be kept or refactored.
-// For this task, assuming ScreenA is fully replaced by IndexPage.
-
-/// The second screen in the bottom navigation bar.
-class ScreenB extends StatelessWidget {
-  /// Constructs a [ScreenB] widget.
-  const ScreenB({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text('Screen B'),
-            TextButton(
-              onPressed: () {
-                GoRouter.of(context).go('/b/details');
-              },
-              child: const Text('View B details'),
-            ),
-            TextButton(onPressed: () {
-              GoRouter.of(context).push('/login');
-            }, child: const Text('go Login'))
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// The third screen in the bottom navigation bar.
-class ScreenC extends StatelessWidget {
-  /// Constructs a [ScreenC] widget.
-  const ScreenC({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text('Screen C'),
-            TextButton(
-              onPressed: () {
-                GoRouter.of(context).go('/c/details');
-              },
-              child: const Text('View C details'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// The details screen for either the A, B or C screen.
-class DetailsScreen extends StatelessWidget {
-  /// Constructs a [DetailsScreen].
-  const DetailsScreen({
-    required this.label,
-    super.key,
-  });
-
-  /// The label to display in the center of the screen.
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Details Screen'),
-      ),
-      body: Center(
-        child: Text(
-          'Details for $label',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
-    );
   }
 }
