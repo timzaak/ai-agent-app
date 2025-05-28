@@ -18,7 +18,7 @@ GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/index', // Changed from '/a'
+  initialLocation: '/login',
   observers: [FlutterSmartDialog.observer],
   debugLogDiagnostics: kDebugMode,
   routes: <RouteBase>[
@@ -33,12 +33,8 @@ final GoRouter appRouter = GoRouter(
           builder: (BuildContext context, GoRouterState state) {
             return const IndexPage(); // Use IndexPage
           },
-          // Removing the sub-route 'details' for '/a' as IndexPage doesn't use it.
-          // If details are needed for IndexPage items, this should be re-evaluated.
         ),
 
-        /// Displayed when the second item in the the bottom navigation bar is
-        /// selected. Changed from /b to /device for DevicePage
         GoRoute(
           path: '/device', // Changed path to /device
           name: DevicePage.sName, // Added name for the route
