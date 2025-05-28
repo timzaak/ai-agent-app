@@ -57,6 +57,8 @@ dependencies:
   flutter_facebook_auth: ^7.1.2
   google_sign_in: ^6.3.0
   mobile_scanner: ^7.0.0
+  chewie: ^1.11.3
+  video_player: ^2.9.5
 
 dev_dependencies:
   flutter_test:
