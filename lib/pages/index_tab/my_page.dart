@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../account/password_page.dart';
 import '../account/password_type.dart';
-// Assuming your login page route name is 'login' as defined in your GoRouter setup
-// import 'package:app/pages/account/login.dart'; 
+import '../../l10n/app_localizations.dart';
 
 class MyPage extends StatelessWidget {
   static const sName = 'my'; // For named navigation
@@ -25,7 +23,7 @@ class MyPage extends StatelessWidget {
       context.go('/login'); // Or directly use the path
     } catch (e) {
       SmartDialog.dismiss();
-      SmartDialog.showToast(l10n.logoutFailed.replaceAll('{error}', e.toString()));
+      SmartDialog.showToast(l10n.logoutFailed(e.toString()));
     }
   }
 
@@ -67,11 +65,11 @@ class MyPage extends StatelessWidget {
           SmartDialog.showToast(l10n.requiresRecentLogin);
           // Optionally, force re-authentication here
         } else {
-          SmartDialog.showToast(l10n.unexpectedError.replaceAll('{error}', e.message ?? ''));
+          SmartDialog.showToast(l10n.unexpectedError(e.message ?? ''));
         }
       } catch (e) {
         SmartDialog.dismiss();
-        SmartDialog.showToast(l10n.unexpectedError.replaceAll('{error}', e.toString()));
+        SmartDialog.showToast(l10n.unexpectedError(e.toString()));
       }
     }
   }

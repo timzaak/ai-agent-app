@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:app/pages/index_tab/device_qr_scan_page.dart'; // Updated import
+import '../../l10n/app_localizations.dart';
 
 // Placeholder for Device model, replace with actual model if available
 class Device {

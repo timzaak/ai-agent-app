@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 
 class VideoListPage extends HookConsumerWidget {
   const VideoListPage({super.key});
@@ -83,11 +83,11 @@ class VideoListPage extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            l10n.time.replaceAll('{time}', video['time'] as String),
+                            l10n.time(video['time'] as String),
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
-                          Text(l10n.device.replaceAll('{name}', video['deviceName'] as String)),
+                          Text(l10n.device(video['deviceName'] as String)),
                         ],
                       ),
                     ),

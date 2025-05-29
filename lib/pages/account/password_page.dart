@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../util/validator.dart';
 import '../../util/turnstile_util.dart';
+import '../../l10n/app_localizations.dart';
 import 'password_type.dart';
 
 class ChangePasswordPage extends HookConsumerWidget {
@@ -90,7 +90,7 @@ class ChangePasswordPage extends HookConsumerWidget {
                           },
                     child: Text(
                       isCounting.value 
-                          ? l10n.resendCode.replaceAll('{seconds}', countdown.value.toString())
+                          ? l10n.resendCode(countdown.value.toString())
                           : l10n.getVerificationCode,
                     ),
                   ),

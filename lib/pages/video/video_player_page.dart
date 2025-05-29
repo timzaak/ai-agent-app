@@ -4,7 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 
 class VideoPlayerPage extends HookConsumerWidget {
   final String videoUrl;
@@ -57,7 +57,7 @@ class VideoPlayerPage extends HookConsumerWidget {
           chewieController.value = newChewieController;
           error.value = null;
         } catch (e) {
-          error.value = l10n.unexpectedError.replaceAll('{error}', e.toString());
+          error.value = l10n.unexpectedError(e.toString());
         } finally {
           isLoading.value = false;
         }

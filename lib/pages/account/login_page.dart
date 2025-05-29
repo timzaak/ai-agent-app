@@ -8,10 +8,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../util/validator.dart';
 import '../../util/turnstile_util.dart';
+import '../../l10n/app_localizations.dart';
+
 import 'password_page.dart';
 import 'password_type.dart';
 
@@ -60,7 +61,7 @@ class LoginPage extends HookConsumerWidget {
     void _handleLogin() async {
       final token = await getTurnstileToken();
       if (token == null) {
-        SmartDialog.showToast(l10n.loginFailed.replaceAll('{error}', 'Captcha verification failed'));
+        SmartDialog.showToast(l10n.loginFailed('Captcha verification failed'));
         return;
       }
 
@@ -83,7 +84,7 @@ class LoginPage extends HookConsumerWidget {
               );
               SmartDialog.showToast(l10n.loginSuccess);
             } catch (e) {
-              SmartDialog.showToast(l10n.loginFailed.replaceAll('{error}', e.toString()));
+              SmartDialog.showToast(l10n.loginFailed(e.toString()));
             }
           }
         } else {
@@ -112,7 +113,7 @@ class LoginPage extends HookConsumerWidget {
         await FirebaseAuth.instance.signInWithCredential(credential);
         SmartDialog.showToast(l10n.googleLoginSuccess);
       } catch (e) {
-        SmartDialog.showToast(l10n.googleLoginFailed.replaceAll('{error}', e.toString()));
+        SmartDialog.showToast(l10n.googleLoginFailed(e.toString()));
       }
     }
 
@@ -127,10 +128,10 @@ class LoginPage extends HookConsumerWidget {
           await FirebaseAuth.instance.signInWithCredential(credential);
           SmartDialog.showToast(l10n.facebookLoginSuccess);
         } else {
-          SmartDialog.showToast(l10n.facebookLoginFailed.replaceAll('{error}', result.message ?? ''));
+          SmartDialog.showToast(l10n.facebookLoginFailed(result.message ?? ''));
         }
       } catch (e) {
-        SmartDialog.showToast(l10n.facebookLoginFailed.replaceAll('{error}', e.toString()));
+        SmartDialog.showToast(l10n.facebookLoginFailed(e.toString()));
       }
     }
 
@@ -197,7 +198,7 @@ class LoginPage extends HookConsumerWidget {
                                 child: Text(
                                   seconds.value == null
                                       ? l10n.getVerificationCode
-                                      : l10n.resendCode.replaceAll('{seconds}', seconds.value.toString()),
+                                      : l10n.resendCode(seconds.value.toString()),
                                 ),
                               ),
                             ),
