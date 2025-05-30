@@ -2,15 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter/foundation.dart';
 
 import '../account/password_page.dart';
 import '../account/password_type.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/version_service.dart';
 
-class MyPage extends StatelessWidget {
-  static const sName = 'my'; // For named navigation
+class MyPage extends StatefulWidget {
+  static const sName = 'my';
 
   const MyPage({super.key});
+
+  @override
+  State<MyPage> createState() => _MyPageState();
+}
+
+class _MyPageState extends State<MyPage> {
+  String _version = '';
+  final _versionService = VersionService();
+
+  @override
+  void initState() {
+    super.initState();
+    _getVersion();
+  }
+
+  Future<void> _getVersion() async {
+    if (!kIsWeb) {
+      final packageInfo = await PackageInfo.fromPlatform();
+      setState(() {
+        _version = packageInfo.version;
+      });
+    }
+  }
+
+  Future<void> _checkVersion() async {
+    if (!kIsWeb) {
+      await _versionService.checkVersion();
+      if (_versionService.hasNewVersion) {
+        await _versionService.showUpgradeDialog();
+      } else {
+        SmartDialog.showToast('当前已是最新版本');
+      }
+    }
+  }
 
   Future<void> _logout(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
@@ -18,9 +55,7 @@ class MyPage extends StatelessWidget {
     try {
       await FirebaseAuth.instance.signOut();
       SmartDialog.dismiss();
-      // Navigate to login screen. Ensure 'login' is a defined route name.
-      // context.goNamed(LoginPage.sName); // If LoginPage.sName is available
-      context.go('/login'); // Or directly use the path
+      context.go('/login');
     } catch (e) {
       SmartDialog.dismiss();
       SmartDialog.showToast(l10n.logoutFailed(e.toString()));
@@ -29,7 +64,6 @@ class MyPage extends StatelessWidget {
 
   Future<void> _deleteAccount(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    // Show confirmation dialog
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -56,14 +90,11 @@ class MyPage extends StatelessWidget {
         await FirebaseAuth.instance.currentUser?.delete();
         SmartDialog.dismiss();
         SmartDialog.showToast(l10n.accountDeletedSuccess);
-        // Navigate to login screen
-        // context.goNamed(LoginPage.sName);
-        context.go('/login'); 
+        context.go('/login');
       } on FirebaseAuthException catch (e) {
         SmartDialog.dismiss();
         if (e.code == 'requires-recent-login') {
           SmartDialog.showToast(l10n.requiresRecentLogin);
-          // Optionally, force re-authentication here
         } else {
           SmartDialog.showToast(l10n.unexpectedError(e.message ?? ''));
         }
@@ -76,18 +107,12 @@ class MyPage extends StatelessWidget {
 
   void _viewUserAgreement(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // Placeholder: In a real app, navigate to User Agreement page or open URL
     SmartDialog.showToast('Navigate to ${l10n.userAgreement} (Not Implemented)');
-    // Example: context.go('/user-agreement');
-    // Or using url_launcher: launchUrl(Uri.parse('https://example.com/user-agreement'));
   }
 
   void _viewPrivacyPolicy(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // Placeholder: In a real app, navigate to Privacy Policy page or open URL
     SmartDialog.showToast('Navigate to ${l10n.privacyPolicy} (Not Implemented)');
-    // Example: context.go('/privacy-policy');
-    // Or using url_launcher: launchUrl(Uri.parse('https://example.com/privacy-policy'));
   }
 
   @override
@@ -99,6 +124,32 @@ class MyPage extends StatelessWidget {
       ),
       body: ListView(
         children: <Widget>[
+          if (!kIsWeb) ListTile(
+            leading: const Icon(Icons.system_update),
+            title: const Text('版本信息'),
+            subtitle: Text(_version),
+            trailing: Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: _checkVersion,
+                ),
+                if (_versionService.hasNewVersion)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
           ListTile(
             leading: const Icon(Icons.policy),
             title: Text(l10n.userAgreement),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app/api/dio_util.dart';
+import 'package:app/services/version_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,8 @@ void main() {
     // 检查 是否时网页
     if (!kIsWeb) {
       await Firebase.initializeApp();
+      // 检查版本更新
+      await VersionService().checkVersion();
     }
     initLogger();
     runApp(const MyApp());
