@@ -54,6 +54,7 @@ dependencies:
   pretty_dio_logger: ^1.4.0
   flutter_color_plugin: ^1.1.0
   firebase_auth: ^5.5.4
+  firebase_messaging: ^15.1.6
   flutter_facebook_auth: ^7.1.2
   google_sign_in: ^6.3.0
   mobile_scanner: ^7.0.0
@@ -62,6 +63,7 @@ dependencies:
   cloudflare_turnstile: ^3.2.1
   flutter_upgrade_version: ^1.1.8
   package_info_plus: ^8.3.0
+  webview_flutter: ^4.13.0
 
 dev_dependencies:
   flutter_test:

@@ -59,7 +59,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get and => 'and';
 
   @override
-  String get unregisteredEmailWillCreateAccount => 'Unregistered email will automatically create an account';
+  String get unregisteredEmailWillCreateAccount =>
+      'Unregistered email will automatically create an account';
 
   @override
   String get myAccount => 'My Account';
@@ -71,7 +72,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteAccount => 'Delete Account';
 
   @override
-  String get deleteAccountConfirm => 'Are you sure you want to delete your account? This action cannot be undone.';
+  String get deleteAccountConfirm =>
+      'Are you sure you want to delete your account? This action cannot be undone.';
 
   @override
   String get cancel => 'Cancel';
@@ -86,7 +88,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountDeletedSuccess => 'Account deleted successfully.';
 
   @override
-  String get requiresRecentLogin => 'This operation is sensitive and requires recent authentication. Please log in again before retrying.';
+  String get requiresRecentLogin =>
+      'This operation is sensitive and requires recent authentication. Please log in again before retrying.';
 
   @override
   String unexpectedError(Object error) {
@@ -157,5 +160,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get pleaseAgreeToTerms => 'Please read and agree to the User Agreement and Privacy Policy';
+  String get pleaseAgreeToTerms =>
+      'Please read and agree to the User Agreement and Privacy Policy';
 }
